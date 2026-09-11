@@ -1,0 +1,6 @@
+{
+  "name": "Lion Track Safari CTA & Lead API",
+  "description": "Production-ready Node.js/Express REST API backend for Lion Track Safari lead generation and CTA capturing with PostgreSQL, Swagger UI docs, and interactive API explorer.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
