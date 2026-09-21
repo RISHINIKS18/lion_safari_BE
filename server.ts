@@ -2,10 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import swaggerUi from 'swagger-ui-express';
 import { createServer as createViteServer } from 'vite';
-
 import apiRouter from './src/routes/index.ts';
 import { swaggerSpec, swaggerDefinition } from './src/config/swagger.ts';
 import { errorHandler } from './src/middleware/errorHandler.ts';
@@ -13,8 +11,6 @@ import { testDbConnection } from './src/config/db.ts';
 
 dotenv.config();
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 async function startServer() {
   const app = express();
