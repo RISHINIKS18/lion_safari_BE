@@ -38,12 +38,14 @@ export async function createSafariEnquiry(req: Request, res: Response, next: Nex
       return;
     }
 
+    const id = crypto.randomUUID();
     const referenceCode = generateSafariEnquiryRef();
     const ipAddress = getClientIp(req);
     const userAgent = req.headers['user-agent'] || '';
 
     const queryText = `
       INSERT INTO safari_enquiries (
+        id,
         reference_code,
         package_title,
         package_id,
@@ -59,11 +61,12 @@ export async function createSafariEnquiry(req: Request, res: Response, next: Nex
         lead_source,
         ip_address,
         user_agent
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
       RETURNING id, reference_code, created_at;
     `;
 
     const values = [
+      id,
       referenceCode,
       packageTitle,
       packageId || null,
@@ -83,7 +86,7 @@ export async function createSafariEnquiry(req: Request, res: Response, next: Nex
 
     await executeQuery(queryText, values, () => {
       const record = {
-        id: crypto.randomUUID(),
+        id,
         reference_code: referenceCode,
         package_title: packageTitle,
         package_id: packageId,

@@ -5,7 +5,7 @@ import partnershipsRouter from './partnerships.routes.ts';
 import newsletterRouter from './newsletter.routes.ts';
 import leadsRouter from './leads.routes.ts';
 import blogRouter from './blog.routes.ts';
-import { getDbStatus, testDbConnection } from '../config/db.ts';
+import { getDbStatus, getPersistedRecordCounts, testDbConnection } from '../config/db.ts';
 
 const apiRouter = Router();
 
@@ -32,6 +32,9 @@ apiRouter.get('/health', async (req, res) => {
   const force = req.query.force === 'true';
   const isConnected = await testDbConnection(force);
   const dbStatus = getDbStatus();
+  const persistedCounts = isConnected
+    ? await getPersistedRecordCounts()
+    : { available: false, source: 'unavailable' as const, counts: null };
 
   res.json({
     status: 'ok',
@@ -45,7 +48,14 @@ apiRouter.get('/health', async (req, res) => {
       targetHost: dbStatus.targetHost,
       targetDatabase: dbStatus.targetDatabase,
       lastError: dbStatus.lastConnectionError,
-      activeRecords: dbStatus.counts,
+      activeRecordsSource: persistedCounts.source,
+      activeRecordsAvailable: persistedCounts.available,
+      activeRecords: persistedCounts.available
+        ? persistedCounts.counts
+        : null,
+      activeRecordsNote: persistedCounts.available
+        ? 'Counts queried from PostgreSQL.'
+        : 'PostgreSQL is unavailable; database counts are not reported.',
     },
     endpoints: [
       { name: 'CTA 1 - Safari Enquiry', method: 'POST', path: '/api/safari/enquiry' },

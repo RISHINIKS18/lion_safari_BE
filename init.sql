@@ -1,16 +1,15 @@
 -- ==========================================================
 -- Lion Track Safari - Call to Action (CTA) & Lead Generation Schema
--- Compatible with PostgreSQL 13+ (Supabase, Neon, Cloud SQL, AWS RDS)
+-- Compatible with PostgreSQL 13+ (cPanel, Cloud SQL, AWS RDS)
+-- UUIDs are generated in Node.js via crypto.randomUUID()
+-- Do not require pgcrypto or gen_random_uuid()
 -- ==========================================================
-
--- Enable pgcrypto / uuid-ossp for gen_random_uuid() if required
-CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 -- ----------------------------------------------------------
 -- CTA 1: Direct Safari & Route Enquiries (From SafariModal)
 -- ----------------------------------------------------------
 CREATE TABLE IF NOT EXISTS safari_enquiries (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id UUID PRIMARY KEY,
     reference_code VARCHAR(30) UNIQUE NOT NULL,
     package_title VARCHAR(255) NOT NULL,
     package_id VARCHAR(100),
@@ -39,7 +38,7 @@ CREATE INDEX IF NOT EXISTS idx_safari_enquiries_created ON safari_enquiries(crea
 -- CTA 2: Bespoke Tailor-Made Safari Quotes (From /contact Builder)
 -- ----------------------------------------------------------
 CREATE TABLE IF NOT EXISTS custom_safari_requests (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id UUID PRIMARY KEY,
     reference_code VARCHAR(30) UNIQUE NOT NULL,
     full_name VARCHAR(150) NOT NULL,
     email VARCHAR(150) NOT NULL,
@@ -70,7 +69,7 @@ CREATE INDEX IF NOT EXISTS idx_custom_safari_created ON custom_safari_requests(c
 -- CTA 3: B2B Travel Agent Partnership Applications
 -- ----------------------------------------------------------
 CREATE TABLE IF NOT EXISTS b2b_agent_applications (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id UUID PRIMARY KEY,
     reference_code VARCHAR(30) UNIQUE NOT NULL,
     agency_name VARCHAR(200) NOT NULL,
     contact_person VARCHAR(150) NOT NULL,
@@ -109,7 +108,7 @@ CREATE INDEX IF NOT EXISTS idx_newsletter_active ON newsletter_subscribers(is_ac
 -- CTA 5: Quick Contact & WhatsApp Call Clicks
 -- ----------------------------------------------------------
 CREATE TABLE IF NOT EXISTS quick_contact_leads (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id UUID PRIMARY KEY,
     channel VARCHAR(50) NOT NULL,
     phone_number_dialed VARCHAR(50) DEFAULT '+255682801818',
     page_origin VARCHAR(255),

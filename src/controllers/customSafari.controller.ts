@@ -53,6 +53,7 @@ export async function createCustomSafariQuote(req: Request, res: Response, next:
       return;
     }
 
+    const id = crypto.randomUUID();
     const referenceCode = generateCustomSafariRef();
     const destinationsJson = typeof destinations === 'string' ? destinations : JSON.stringify(destinations);
     const countryVal = country || countryOfResidence || null;
@@ -61,6 +62,7 @@ export async function createCustomSafariQuote(req: Request, res: Response, next:
 
     const queryText = `
       INSERT INTO custom_safari_requests (
+        id,
         reference_code,
         full_name,
         email,
@@ -78,11 +80,12 @@ export async function createCustomSafariQuote(req: Request, res: Response, next:
         subject,
         message,
         assigned_director
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8::jsonb, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
       RETURNING id, reference_code, created_at;
     `;
 
     const values = [
+      id,
       referenceCode,
       fullName,
       email,
@@ -104,7 +107,7 @@ export async function createCustomSafariQuote(req: Request, res: Response, next:
 
     await executeQuery(queryText, values, () => {
       const record = {
-        id: crypto.randomUUID(),
+        id,
         reference_code: referenceCode,
         full_name: fullName,
         email,

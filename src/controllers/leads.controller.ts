@@ -21,17 +21,21 @@ export async function logQuickContactLead(req: Request, res: Response, next: Nex
 
     const locationHint = userLocationHint || (req.headers['accept-language'] ? req.headers['accept-language'].slice(0, 50) : null);
 
+    const id = crypto.randomUUID();
+
     const queryText = `
       INSERT INTO quick_contact_leads (
+        id,
         channel,
         phone_number_dialed,
         page_origin,
         user_location_hint
-      ) VALUES ($1, $2, $3, $4)
+      ) VALUES ($1, $2, $3, $4, $5)
       RETURNING id, channel, clicked_at;
     `;
 
     const values = [
+      id,
       channel,
       phoneNumberDialed || '+255682801818',
       pageOrigin || null,
@@ -40,7 +44,7 @@ export async function logQuickContactLead(req: Request, res: Response, next: Nex
 
     await executeQuery(queryText, values, () => {
       const record = {
-        id: crypto.randomUUID(),
+        id,
         channel,
         phone_number_dialed: phoneNumberDialed || '+255682801818',
         page_origin: pageOrigin,

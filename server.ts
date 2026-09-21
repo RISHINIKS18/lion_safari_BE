@@ -46,15 +46,12 @@ async function startServer() {
   // Mount Master CTA API Endpoints
   app.use('/api', apiRouter);
 
-  // Centralized Error Handler for API errors
-  app.use(errorHandler);
-
   // Test DB Connection in background (non-blocking)
   testDbConnection().catch((err) => {
     console.warn('Initial DB test caught:', err.message);
   });
 
-  // Vite Middleware for Frontend Interactive Console
+  // Vite is development-only. Production serves the built SPA from dist/.
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
       server: { middlewareMode: true },
@@ -64,10 +61,22 @@ async function startServer() {
   } else {
     const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath));
-    app.get('*', (req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
+    app.get('*', (req, res, next) => {
+      if (req.path.startsWith('/api') || req.path.startsWith('/api-docs')) {
+        res.status(404).json({
+          success: false,
+          error: 'Not Found',
+          message: `No route for ${req.method} ${req.path}`,
+        });
+        return;
+      }
+      res.sendFile(path.join(distPath, 'index.html'), (err) => {
+        if (err) next(err);
+      });
     });
   }
+
+  app.use(errorHandler);
 
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`====================================================`);

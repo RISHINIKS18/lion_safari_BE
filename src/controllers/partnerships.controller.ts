@@ -34,10 +34,12 @@ export async function createPartnershipApplication(req: Request, res: Response, 
       return;
     }
 
+    const id = crypto.randomUUID();
     const referenceCode = generateB2BAgentRef();
 
     const queryText = `
       INSERT INTO b2b_agent_applications (
+        id,
         reference_code,
         agency_name,
         contact_person,
@@ -49,11 +51,12 @@ export async function createPartnershipApplication(req: Request, res: Response, 
         message,
         wholesale_rate_sent,
         status
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
       RETURNING id, reference_code, created_at;
     `;
 
     const values = [
+      id,
       referenceCode,
       agencyName,
       contactPerson,
@@ -69,7 +72,7 @@ export async function createPartnershipApplication(req: Request, res: Response, 
 
     await executeQuery(queryText, values, () => {
       const record = {
-        id: crypto.randomUUID(),
+        id,
         reference_code: referenceCode,
         agency_name: agencyName,
         contact_person: contactPerson,
